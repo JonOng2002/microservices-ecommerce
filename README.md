@@ -1,135 +1,107 @@
-# Turborepo starter
+# Microservices E-Commerce Platform
 
-This Turborepo starter is maintained by the Turborepo core team.
+A full-stack e-commerce platform built with microservices architecture, featuring product management, orders, payments, authentication, and inventory tracking.
 
-## Using this example
+## 🏗️ Architecture
 
-Run the following command:
+### Services
 
-```sh
-npx create-turbo@latest
+- **Product Service** (Port 8000) - Product and category management with PostgreSQL
+- **Order Service** (Port 8001) - Order processing with MongoDB
+- **Auth Service** (Port 8003) - User management with Clerk
+- **Payment Service** (Port 8002) - Payment processing with Stripe
+- **Email Service** - Order confirmations via Kafka consumers
+
+### Frontend
+
+- **Client Frontend** (Port 3002) - Customer-facing Next.js app
+- **Admin Frontend** (Port 3003) - Admin dashboard Next.js app
+
+### Infrastructure
+
+- **PostgreSQL** - Product data (RDS for production)
+- **MongoDB** - Order data (DocumentDB for production)
+- **DynamoDB** - Inventory tracking with low-stock alerts
+- **Kafka** - Event-driven communication (AWS MSK for production)
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js >= 18
+- pnpm (package manager)
+- Docker & Docker Compose
+- AWS CLI (for LocalStack)
+
+### 1. Install Dependencies
+
+```bash
+pnpm install
 ```
 
-## What's inside?
+### 2. Setup Environment Variables
 
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+```bash
+./scripts/setup-local-env.sh
 ```
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+Then update `.env` files with your API keys:
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+- **Clerk**: Get from https://dashboard.clerk.com
+- **Stripe**: Get from https://dashboard.stripe.com/apikeys
+- See [API Keys Guide](./docs/API_KEYS_GUIDE.md) for details
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+### 3. Start Local Infrastructure
 
-### Develop
+```bash
+# Start databases (PostgreSQL, MongoDB, LocalStack)
+docker-compose -f docker-compose.local.yml up -d
 
-To develop all apps and packages, run the following command:
+# Setup DynamoDB table
+./scripts/setup-local-dynamodb.sh
 
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
+# Start Kafka
+cd packages/kafka && docker-compose up -d
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+### 4. Setup Database
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
+```bash
+# Generate Prisma client and run migrations
+pnpm db:generate
+pnpm db:migrate
 ```
 
-### Remote Caching
+### 5. Start All Services
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
+```bash
+pnpm dev
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+This starts:
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+- ✅ All backend services (8000, 8001, 8002, 8003)
+- ✅ Frontend apps (3002, 3003)
+- ✅ Kafka consumer services
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
+### 6. Access Applications
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
+- **Client Frontend**: http://localhost:3002
+- **Admin Frontend**: http://localhost:3003
+- **Kafka UI**: http://localhost:8080
+- **Product Service**: http://localhost:8000/health
+- **Order Service**: http://localhost:8001/health
+- **Payment Service**: http://localhost:8002/health
+- **Auth Service**: http://localhost:8003/health
 
-## Useful Links
+## 📚 Documentation
 
-Learn more about the power of Turborepo:
+- [Local Testing Guide](./docs/LOCAL_TESTING.md) - Detailed setup instructions
+- [API Keys Guide](./docs/API_KEYS_GUIDE.md) - Required API keys and setup
+- [Environment Variables](./docs/ENVIRONMENT_VARIABLES.md) - Complete env var reference
+- [ECS Deployment](./docs/ECS_DEPLOYMENT.md) - AWS deployment guide
+- [Setup Summary](./docs/SETUP_SUMMARY.md) - Architecture decisions and changes
 
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+## 🛠️ Development
+
+### Project Structure
