@@ -1,5 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 
+export const dynamic = 'force-dynamic';
+
 const TestPage = async () => {
   const { getToken } = await auth();
   const token = await getToken();

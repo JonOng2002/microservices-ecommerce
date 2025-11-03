@@ -8,9 +8,8 @@ import { runKafkaSubscriptions } from "./utils/subscriptions.js";
 import webhookRoute from "./routes/webhooks.route.js";
 
 const app = new Hono();
-app.use("*", clerkMiddleware());
-app.use("*", cors({ origin: ["http://localhost:3002"] }));
 
+// Health endpoint BEFORE Clerk middleware (so it doesn't require auth)
 app.get("/health", (c) => {
   return c.json({
     status: "ok",
@@ -18,6 +17,9 @@ app.get("/health", (c) => {
     timestamp: Date.now(),
   });
 });
+
+app.use("*", clerkMiddleware());
+app.use("*", cors({ origin: ["http://localhost:3002"] }));
 
 app.route("/sessions", sessionRoute);
 app.route("/webhooks", webhookRoute);
@@ -45,8 +47,10 @@ app.route("/webhooks", webhookRoute);
 
 const start = async () => {
   try {
-    Promise.all([await producer.connect(), await consumer.connect()]);
-    await runKafkaSubscriptions()
+    await Promise.all([producer.connect(), consumer.connect()]);
+    console.log("Kafka connected for payment service");
+    
+    // Start server first, then subscribe to topics (non-blocking)
     serve(
       {
         fetch: app.fetch,
@@ -56,8 +60,15 @@ const start = async () => {
         console.log(`Payment service is running on port 8002`);
       }
     );
+    
+    // Subscribe to topics (if this fails, service still runs)
+    try {
+      await runKafkaSubscriptions();
+    } catch (subError) {
+      console.error("Warning: Kafka subscription failed, but service will continue:", subError);
+    }
   } catch (error) {
-    console.log(error);
+    console.error("Payment service startup error:", error);
     process.exit(1);
   }
 };

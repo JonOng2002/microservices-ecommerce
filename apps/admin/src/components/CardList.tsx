@@ -126,22 +126,34 @@ const CardList = async ({ title }: { title: string }) => {
   let products: ProductsType = [];
   let orders: OrderType[] = [];
 
-  const { getToken } = await auth();
-  const token = await getToken();
+  try {
+    const { getToken } = await auth();
+    const token = await getToken();
 
-  if (title === "Popular Products") {
-    products = await fetch(
-      `${process.env.NEXT_PUBLIC_PRODUCT_SERVICE_URL}/products?limit=5&popular=true`
-    ).then((res) => res.json());
-  } else {
-    orders = await fetch(
-      `${process.env.NEXT_PUBLIC_ORDER_SERVICE_URL}/orders?limit=5`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+    if (title === "Popular Products") {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_PRODUCT_SERVICE_URL}/products?limit=5&popular=true`
+      );
+      if (res.ok) {
+        const data = await res.json();
+        products = Array.isArray(data) ? data : [];
       }
-    ).then((res) => res.json());
+    } else {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_ORDER_SERVICE_URL}/orders?limit=5`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        orders = Array.isArray(data) ? data : [];
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching data for CardList:", error);
   }
 
   return (

@@ -12,9 +12,7 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.json());
-app.use(clerkMiddleware());
-
+// Health endpoint BEFORE Clerk middleware (so it doesn't require auth)
 app.get("/health", (req: Request, res: Response) => {
   return res.status(200).json({
     status: "ok",
@@ -22,6 +20,9 @@ app.get("/health", (req: Request, res: Response) => {
     timestamp: Date.now(),
   });
 });
+
+app.use(express.json());
+app.use(clerkMiddleware());
 
 app.use("/users", shouldBeAdmin, userRoute);
 

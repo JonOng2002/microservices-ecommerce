@@ -36,3 +36,28 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+
+# env files
+.env*
+
+#scripts
+scripts/setup-local-env.sh
+scripts/check-services.sh
+scripts/setup-local-dynamodb.sh
+scripts/generate-prisma-client.sh
+scripts/fix-kafka-topics.sh
+
+#ecs
+ecs/task-definitions/*
+ecs/service-definitions/*
+ecs/cluster-definitions/*
+ecs/security-group-definitions/*
+ecs/subnet-definitions/*
+ecs/vpc-definitions/*
+ecs/load-balancer-definitions/*
+ecs/target-group-definitions/*
+ecs/listener-definitions/*
+ecs/listener-rule-definitions/*
+
+#docs
+docs/*

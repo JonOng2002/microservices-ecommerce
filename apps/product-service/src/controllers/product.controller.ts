@@ -60,40 +60,57 @@ export const deleteProduct = async (req: Request, res: Response) => {
 };
 
 export const getProducts = async (req: Request, res: Response) => {
-  const { sort, category, search, limit } = req.query;
+  try {
+    const { sort, category, search, limit, popular } = req.query;
 
-  const orderBy = (() => {
-    switch (sort) {
-      case "asc":
-        return { price: Prisma.SortOrder.asc };
-        break;
-      case "desc":
-        return { price: Prisma.SortOrder.desc };
-        break;
-      case "oldest":
-        return { createdAt: Prisma.SortOrder.asc };
-        break;
-      default:
-        return { createdAt: Prisma.SortOrder.desc };
-        break;
-    }
-  })();
+    const orderBy = (() => {
+      switch (sort) {
+        case "asc":
+          return { price: Prisma.SortOrder.asc };
+        case "desc":
+          return { price: Prisma.SortOrder.desc };
+        case "oldest":
+          return { createdAt: Prisma.SortOrder.asc };
+        default:
+          return { createdAt: Prisma.SortOrder.desc };
+      }
+    })();
 
-  const products = await prisma.product.findMany({
-    where: {
-      category: {
+    // Build where clause conditionally
+    const where: Prisma.ProductWhereInput = {};
+    
+    if (category) {
+      where.category = {
         slug: category as string,
-      },
-      name: {
+      };
+    }
+    
+    if (search) {
+      where.name = {
         contains: search as string,
         mode: "insensitive",
-      },
-    },
-    orderBy,
-    take: limit ? Number(limit) : undefined,
-  });
+      };
+    }
 
-  res.status(200).json(products);
+    // Handle popular filter if needed (you may want to add this logic)
+    // if (popular === "true") {
+    //   // Add logic for popular products
+    // }
+
+    const products = await prisma.product.findMany({
+      where,
+      orderBy,
+      take: limit ? Number(limit) : undefined,
+      include: {
+        category: true,
+      },
+    });
+
+    res.status(200).json(products);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    res.status(500).json({ message: "Failed to fetch products", error: error instanceof Error ? error.message : "Unknown error" });
+  }
 };
 
 export const getProduct = async (req: Request, res: Response) => {

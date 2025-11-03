@@ -8,15 +8,17 @@ import { runKafkaSubscriptions } from "./utils/subscriptions.js";
 
 const fastify = Fastify();
 
-fastify.register(Clerk.clerkPlugin);
-
-fastify.get("/health", (request, reply) => {
+// Health endpoint BEFORE Clerk plugin (so it doesn't require auth)
+fastify.get("/health", async (request, reply) => {
   return reply.status(200).send({
     status: "ok",
     uptime: process.uptime(),
     timestamp: Date.now(),
   });
 });
+
+// Register Clerk plugin AFTER health endpoint
+fastify.register(Clerk.clerkPlugin);
 
 fastify.get("/test", { preHandler: shouldBeUser }, (request, reply) => {
   return reply.send({
@@ -29,16 +31,25 @@ fastify.register(orderRoute);
 
 const start = async () => {
   try {
-    Promise.all([
-      await connectOrderDB(),
-      await producer.connect(),
-      await consumer.connect(),
+    await Promise.all([
+      connectOrderDB(),
+      producer.connect(),
+      consumer.connect(),
     ]);
-    await runKafkaSubscriptions();
+    console.log("Order service: Database and Kafka connected");
+    
+    // Start server first, then subscribe to topics (non-blocking)
     await fastify.listen({ port: 8001 });
     console.log("Order service is running on port 8001");
+    
+    // Subscribe to topics (if this fails, service still runs)
+    try {
+      await runKafkaSubscriptions();
+    } catch (subError) {
+      console.error("Warning: Kafka subscription failed, but service will continue:", subError);
+    }
   } catch (err) {
-    console.log(err);
+    console.error("Order service startup error:", err);
     process.exit(1);
   }
 };

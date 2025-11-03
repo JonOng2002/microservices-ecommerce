@@ -151,11 +151,22 @@ const fetchData = async ({
   search?: string;
   params: "homepage" | "products";
 }) => {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_PRODUCT_SERVICE_URL}/products?${category ? `category=${category}` : ""}${search ? `&search=${search}` : ""}&sort=${sort || "newest"}${params === "homepage" ? "&limit=8" : ""}`
-  );
-  const data: ProductType[] = await res.json();
-  return data;
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_PRODUCT_SERVICE_URL}/products?${category ? `category=${category}` : ""}${search ? `&search=${search}` : ""}&sort=${sort || "newest"}${params === "homepage" ? "&limit=8" : ""}`
+    );
+    
+    if (!res.ok) {
+      console.error("Failed to fetch products:", res.status, res.statusText);
+      return [];
+    }
+    
+    const data: ProductType[] = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    return [];
+  }
 };
 const ProductList = async ({
   category,
@@ -169,6 +180,19 @@ const ProductList = async ({
   params: "homepage" | "products";
 }) => {
   const products = await fetchData({ category, sort, search, params });
+  
+  if (!Array.isArray(products) || products.length === 0) {
+    return (
+      <div className="w-full">
+        <Categories />
+        {params === "products" && <Filter />}
+        <div className="text-center py-8">
+          <p className="text-gray-500">No products found.</p>
+        </div>
+      </div>
+    );
+  }
+  
   return (
     <div className="w-full">
       <Categories />

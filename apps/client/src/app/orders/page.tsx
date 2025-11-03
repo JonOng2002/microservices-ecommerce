@@ -1,6 +1,8 @@
 import { auth } from "@clerk/nextjs/server";
 import { OrderType } from "@repo/types";
 
+export const dynamic = 'force-dynamic';
+
 const fetchOrders = async () => {
   const { getToken } = await auth();
   const token = await getToken();
