@@ -13,8 +13,8 @@ const router: Router = Router();
 router.post("/", shouldBeAdmin, createInventory);
 router.get("/low-stock", shouldBeAdmin, getLowStock);
 router.get("/", getInventory);
-router.put("/:productId/:variantKey", shouldBeAdmin, updateInventory);
-router.delete("/:productId/:variantKey", shouldBeAdmin, deleteInventory);
+router.put("/:productId", shouldBeAdmin, updateInventory);
+router.delete("/:productId", shouldBeAdmin, deleteInventory);
 
 export default router;
 

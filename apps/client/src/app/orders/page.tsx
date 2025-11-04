@@ -4,12 +4,12 @@ import { useAuth } from "@clerk/nextjs";
 import { OrderType } from "@repo/types";
 import { useEffect, useState } from "react";
 
-const fetchOrders = async (token: string | null): Promise<OrderType[]> => {
-  if (!token) return [];
+const fetchOrders = async (token: string | null, userId: string | null): Promise<OrderType[]> => {
+  if (!token || !userId) return [];
   
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_ORDER_SERVICE_URL}/user-orders`,
+      `${process.env.NEXT_PUBLIC_ORDER_SERVICE_URL}/user-orders?userId=${userId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -31,14 +31,14 @@ const fetchOrders = async (token: string | null): Promise<OrderType[]> => {
 };
 
 const OrdersPage = () => {
-  const { getToken, isLoaded } = useAuth();
+  const { getToken, userId, isLoaded } = useAuth();
   const [orders, setOrders] = useState<OrderType[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (isLoaded) {
+    if (isLoaded && userId) {
       getToken()
-        .then((token) => fetchOrders(token))
+        .then((token) => fetchOrders(token, userId))
         .then((data) => {
           setOrders(data);
           setLoading(false);
@@ -47,8 +47,11 @@ const OrdersPage = () => {
           console.error("Error fetching orders:", error);
           setLoading(false);
         });
+    } else if (isLoaded && !userId) {
+      // User not authenticated
+      setLoading(false);
     }
-  }, [isLoaded, getToken]);
+  }, [isLoaded, getToken, userId]);
 
   if (loading) {
     return (

@@ -1,5 +1,5 @@
-# Multi-stage build for email-service
-FROM node:18-alpine AS base
+# Single-stage build for email-service (optimized for ECS deployment)
+FROM node:18-alpine
 
 # Install pnpm
 RUN npm install -g pnpm@9.0.0
@@ -7,49 +7,22 @@ RUN npm install -g pnpm@9.0.0
 # Set working directory
 WORKDIR /app
 
-# Copy root package files
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY turbo.json ./
+# Copy root workspace files
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
 
-# Copy all package.json files for workspace dependencies
-COPY packages/*/package.json ./packages/*/
-COPY apps/*/package.json ./apps/*/
-
-# Install dependencies
-RUN pnpm install --frozen-lockfile
-
-# Build stage
-FROM base AS builder
-
-# Copy all source files
+# Copy all workspace packages
 COPY packages ./packages
+
+# Copy the service
 COPY apps/email-service ./apps/email-service
 
-# Build the service
-WORKDIR /app
-RUN pnpm --filter email-service build || echo "Build may not be required"
+# Install all dependencies
+RUN pnpm install --frozen-lockfile
 
-# Production stage
-FROM base AS runner
-
-WORKDIR /app
-
-# Copy built artifacts and dependencies
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/packages ./packages
-COPY --from=builder /app/apps/email-service ./apps/email-service
-
-# Copy package.json files
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY apps/email-service/package.json ./apps/email-service/
-
-# Set working directory to service
+# Set working directory to the service
 WORKDIR /app/apps/email-service
 
-# Health check (email-service doesn't have HTTP, so skip)
-# HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-#   CMD node -e "console.log('healthy')"
+# No HTTP port - this is a Kafka consumer
 
 # Run the service
-CMD ["pnpm", "dlx", "tsx", "--env-file=.env", "src/index.ts"]
-
+CMD ["pnpm", "dlx", "tsx", "src/index.ts"]

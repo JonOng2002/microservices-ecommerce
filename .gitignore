@@ -37,6 +37,9 @@ yarn-error.log*
 .DS_Store
 *.pem
 
+# Package manager cache
+.pnpm-store/
+
 # env files
 .env*
 
@@ -59,5 +62,32 @@ ecs/target-group-definitions/*
 ecs/listener-definitions/*
 ecs/listener-rule-definitions/*
 
-#docs
-docs/*
+# Docs - keep useful docs, ignore drafts/planning
+docs/FRONTEND_STATIC_EXPORT_PLAN.md
+docs/S3_STATIC_HOSTING_EXPLAINED.md
+docs/SETUP_SUMMARY.md
+
+# AWS policies and configs (sensitive)
+*_POLICY.json
+*.policy.json
+S3_*.json
+# Note: S3_PUBLIC_READ_POLICY.json contains bucket name - review if needed
+
+# Environment file packages (sensitive)
+team-env-files.zip
+env-files.zip
+*-env-*.zip
+
+# Docker test environment files (sensitive)
+.env.docker-test
+
+# Draft/planning files (not needed for teammates)
+LOCAL_TESTING_RESULTS.md
+ORDER_CREATION_FIX.md
+QUICK_START_DYNAMODB.md
+START_FRONTEND_WITH_DOCKER.md
+
+# Unused docker-compose files
+docker-compose.fullstack-test.yml
+
+docs/

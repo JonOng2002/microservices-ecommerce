@@ -40,7 +40,8 @@ sessionRoute.post("/create-checkout-session", shouldBeUser, async (c) => {
           id: item.id,
           name: item.name,
           quantity: item.quantity,
-          price: item.price
+          price: item.price,
+          size: (item as any).selectedSize || "m" // Include selected size for inventory updates
         })))
       }
     });
@@ -77,9 +78,11 @@ sessionRoute.get("/:session_id", async (c) => {
           status: "success",
           products: cartItems.length > 0 
             ? cartItems.map((item: any) => ({
+                id: item.id, // Include product ID for inventory updates
                 name: item.name,
                 quantity: item.quantity,
                 price: item.price * 100, // Convert to cents
+                size: item.size || "m", // Include size for inventory updates
               }))
             : lineItems.map((item) => ({
                 name: item.description,

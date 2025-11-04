@@ -12,18 +12,27 @@ import {
 
 export const createInventory = async (req: Request, res: Response) => {
   try {
-    const data: Omit<InventoryItem, "lastUpdated"> = req.body;
+    const data: InventoryItem = req.body;
     
-    if (!data.productId || !data.variantKey || data.quantity === undefined) {
+    if (!data.product_id || !data.product_name || !data.product_slug) {
       return res.status(400).json({ 
-        message: "productId, variantKey, and quantity are required!" 
+        message: "product_id, product_name, and product_slug are required!" 
       });
     }
 
-    const inventoryItem = await createInventoryItem({
-      ...data,
-      lastUpdated: new Date().toISOString(),
-    });
+    if (data.quantity_l === undefined || data.quantity_m === undefined || data.quantity_s === undefined) {
+      return res.status(400).json({ 
+        message: "quantity_l, quantity_m, and quantity_s are required!" 
+      });
+    }
+
+    if (data.stock_threshold === undefined) {
+      return res.status(400).json({ 
+        message: "stock_threshold is required!" 
+      });
+    }
+
+    const inventoryItem = await createInventoryItem(data);
 
     res.status(201).json(inventoryItem);
   } catch (error: any) {
@@ -34,19 +43,14 @@ export const createInventory = async (req: Request, res: Response) => {
 
 export const getInventory = async (req: Request, res: Response) => {
   try {
-    const { productId, variantKey } = req.query;
+    const { productId } = req.query;
 
-    if (productId && variantKey) {
-      const item = await getInventoryItem(productId as string, variantKey as string);
+    if (productId) {
+      const item = await getInventoryItem(productId as string);
       if (!item) {
         return res.status(404).json({ message: "Inventory item not found" });
       }
       return res.status(200).json(item);
-    }
-
-    if (productId) {
-      const items = await getInventoryByProduct(productId as string);
-      return res.status(200).json(items);
     }
 
     const items = await getAllInventory();
@@ -59,18 +63,23 @@ export const getInventory = async (req: Request, res: Response) => {
 
 export const updateInventory = async (req: Request, res: Response) => {
   try {
-    const { productId, variantKey } = req.params;
-    const { quantity, operation = "set" } = req.body;
+    const { productId } = req.params;
+    const { quantity_l, quantity_m, quantity_s, operation = "set" } = req.body;
 
-    if (quantity === undefined) {
-      return res.status(400).json({ message: "quantity is required" });
+    if (quantity_l === undefined && quantity_m === undefined && quantity_s === undefined) {
+      return res.status(400).json({ 
+        message: "At least one of quantity_l, quantity_m, or quantity_s is required" 
+      });
     }
 
     const updatedItem = await updateInventoryQuantity(
       productId,
-      variantKey,
-      quantity,
-      operation
+      {
+        quantity_l,
+        quantity_m,
+        quantity_s,
+        operation,
+      }
     );
 
     res.status(200).json(updatedItem);
@@ -82,9 +91,9 @@ export const updateInventory = async (req: Request, res: Response) => {
 
 export const deleteInventory = async (req: Request, res: Response) => {
   try {
-    const { productId, variantKey } = req.params;
+    const { productId } = req.params;
 
-    await deleteInventoryItem(productId, variantKey);
+    await deleteInventoryItem(productId);
     res.status(200).json({ message: "Inventory item deleted successfully" });
   } catch (error: any) {
     console.error(error);

@@ -60,6 +60,10 @@ const AddProduct = () => {
       sizes: [],
       colors: [],
       images: {},
+      quantity_l: 0,
+      quantity_m: 0,
+      quantity_s: 0,
+      stock_threshold: 5,
     },
   });
 
@@ -251,7 +255,7 @@ const AddProduct = () => {
                           {sizes.map((size) => (
                             <div className="flex items-center gap-2" key={size}>
                               <Checkbox
-                                id="size"
+                                id={`size-${size}`}
                                 checked={field.value?.includes(size)}
                                 onCheckedChange={(checked) => {
                                   const currentValues = field.value || [];
@@ -264,7 +268,7 @@ const AddProduct = () => {
                                   }
                                 }}
                               />
-                              <label htmlFor="size" className="text-xs">
+                              <label htmlFor={`size-${size}`} className="text-xs uppercase">
                                 {size}
                               </label>
                             </div>
@@ -272,7 +276,106 @@ const AddProduct = () => {
                         </div>
                       </FormControl>
                       <FormDescription>
-                        Select the available sizes for the product.
+                        Select the available sizes for the product (L, M, S only).
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {/* Inventory quantities - only show for selected sizes */}
+                {form.watch("sizes")?.includes("l") && (
+                  <FormField
+                    control={form.control}
+                    name="quantity_l"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Quantity (L)</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(Number(e.target.value))
+                            }
+                            min={0}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Enter the stock quantity for size L.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+                {form.watch("sizes")?.includes("m") && (
+                  <FormField
+                    control={form.control}
+                    name="quantity_m"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Quantity (M)</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(Number(e.target.value))
+                            }
+                            min={0}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Enter the stock quantity for size M.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+                {form.watch("sizes")?.includes("s") && (
+                  <FormField
+                    control={form.control}
+                    name="quantity_s"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Quantity (S)</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(Number(e.target.value))
+                            }
+                            min={0}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Enter the stock quantity for size S.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+                <FormField
+                  control={form.control}
+                  name="stock_threshold"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Stock Threshold</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(Number(e.target.value))
+                          }
+                          min={0}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Alert when stock falls below this number (default: 5).
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
