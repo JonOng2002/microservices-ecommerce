@@ -1,3 +1,8 @@
+"use client";
+
+// Auth removed - no Clerk needed
+import { useState, useEffect } from "react";
+
 import {
   Home,
   Inbox,
@@ -70,6 +75,17 @@ const items = [
 ];
 
 const AppSidebar = () => {
+  // Auth removed - no user data needed
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Auth removed - no sign out needed
+  const handleSignOut = () => {
+    console.log("Sign out (auth removed)");
+  };
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="py-4">
@@ -78,7 +94,7 @@ const AppSidebar = () => {
             <SidebarMenuButton asChild>
               <Link href="/">
                 <Image src="/logo.svg" alt="logo" width={20} height={20} />
-                <span>Lama Dev</span>
+                <span>Admin</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -227,13 +243,13 @@ const AppSidebar = () => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
-                  <User2 /> John Doe <ChevronUp className="ml-auto" />
+                  <User2 /> Admin <ChevronUp className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem>Account</DropdownMenuItem>
                 <DropdownMenuItem>Setting</DropdownMenuItem>
-                <DropdownMenuItem>Sign out</DropdownMenuItem>
+                <DropdownMenuItem onClick={handleSignOut}>Sign out</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>

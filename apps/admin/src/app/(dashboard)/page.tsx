@@ -1,27 +1,45 @@
+"use client";
+
 import AppAreaChart from "@/components/AppAreaChart";
 import AppBarChart from "@/components/AppBarChart";
 import AppPieChart from "@/components/AppPieChart";
 import CardList from "@/components/CardList";
 import TodoList from "@/components/TodoList";
-import { auth } from "@clerk/nextjs/server";
+import { useEffect, useState } from "react";
 
-export const dynamic = 'force-dynamic';
+const Homepage = () => {
+  // Auth removed - no token needed
+  const [orderChartData, setOrderChartData] = useState<any>(null);
 
-const Homepage = async () => {
-  const { getToken } = await auth();
-  const token = await getToken();
-  const orderChartData = fetch(
-    `${process.env.NEXT_PUBLIC_ORDER_SERVICE_URL}/order-chart`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  ).then(res => res.json());
+  useEffect(() => {
+    const fetchChartData = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_ORDER_SERVICE_URL}/order-chart`
+        );
+
+        if (!res.ok) {
+          console.error(`Failed to fetch order chart: ${res.status} ${res.statusText}`);
+          setOrderChartData([]);
+          return;
+        }
+
+        const data = await res.json();
+        setOrderChartData(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Error fetching order chart data:", error);
+        // Set empty array on error so component still renders
+        setOrderChartData([]);
+      }
+    };
+
+    fetchChartData();
+  }, []);
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-4 gap-4">
       <div className="bg-primary-foreground p-4 rounded-lg lg:col-span-2 xl:col-span-1 2xl:col-span-2">
-        <AppBarChart dataPromise={orderChartData} />
+        <AppBarChart data={orderChartData} />
       </div>
       <div className="bg-primary-foreground p-4 rounded-lg">
         <CardList title="Latest Transactions" />

@@ -19,13 +19,13 @@ const Navbar = () => {
       <Link href="/" className="flex items-center">
         <Image
           src="/logo.png"
-          alt="TrendLama"
+          alt="Men'sWears"
           width={36}
           height={36}
           className="w-6 h-6 md:w-9 md:h-9"
         />
         <p className="hidden md:block text-md font-medium tracking-wider">
-          TRENDLAMA.
+          MEN'SWEARS.
         </p>
       </Link>
       {/* RIGHT */}

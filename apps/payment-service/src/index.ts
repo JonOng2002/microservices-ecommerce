@@ -9,7 +9,15 @@ import webhookRoute from "./routes/webhooks.route.js";
 
 const app = new Hono();
 
-// Health endpoint BEFORE Clerk middleware (so it doesn't require auth)
+// CORS FIRST - Must handle OPTIONS preflight requests before any other middleware
+app.use("*", cors({ 
+  origin: ["http://localhost:3002", "http://localhost:3003"],
+  credentials: true,
+  allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowHeaders: ["Content-Type", "Authorization"]
+}));
+
+// Health endpoint (doesn't require auth)
 app.get("/health", (c) => {
   return c.json({
     status: "ok",
@@ -18,8 +26,8 @@ app.get("/health", (c) => {
   });
 });
 
+// Clerk middleware - applied globally but individual routes use shouldBeUser to enforce
 app.use("*", clerkMiddleware());
-app.use("*", cors({ origin: ["http://localhost:3002"] }));
 
 app.route("/sessions", sessionRoute);
 app.route("/webhooks", webhookRoute);

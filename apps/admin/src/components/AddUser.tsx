@@ -27,7 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "./ui/button";
-import { useAuth } from "@clerk/nextjs";
+// Auth removed - no Clerk needed
 import { useMutation } from "@tanstack/react-query";
 import { UserFormSchema } from "@repo/types";
 import { toast } from "react-toastify";
@@ -44,11 +44,9 @@ const AddUser = () => {
     },
   });
 
-  const { getToken } = useAuth();
-
+  // Auth removed - no token needed
   const mutation = useMutation({
     mutationFn: async (data: z.infer<typeof UserFormSchema>) => {
-      const token = await getToken();
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/users`,
         {
@@ -56,7 +54,6 @@ const AddUser = () => {
           body: JSON.stringify(data),
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
         }
       );

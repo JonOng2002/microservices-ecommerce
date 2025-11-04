@@ -1,29 +1,14 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-import { CustomJwtSessionClaims } from "@repo/types";
+// Auth removed - all routes are now public for easier deployment
+// If you need auth later, you can re-enable Clerk middleware here
 
-const isPublicRoute = createRouteMatcher(["/sign-in(.*)","/unauthorized(.*)"]);
-
-export default clerkMiddleware(async (auth, req) => {
-  if (!isPublicRoute(req)) {
-    await auth.protect();
-
-    const { userId, sessionClaims } = await auth();
-
-    if (userId && sessionClaims) {
-      const userRole = (sessionClaims as CustomJwtSessionClaims).metadata?.role;
-
-      if (userRole !== "admin") {
-        return Response.redirect(new URL("/unauthorized", req.url));
-      }
-    }
-  }
-});
+export default function middleware() {
+  // No auth checks - all routes are public
+  return;
+}
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
+    // Skip all routes - no auth needed
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
-    "/(api|trpc)(.*)",
   ],
 };

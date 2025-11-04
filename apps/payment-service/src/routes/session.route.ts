@@ -3,6 +3,7 @@ import stripe from "../utils/stripe";
 import { shouldBeUser } from "../middleware/authMiddleware";
 import { CartItemsType } from "@repo/types";
 import { getStripeProductPrice } from "../utils/stripeProduct";
+import { producer } from "../utils/kafka";
 
 const sessionRoute = new Hono();
 
@@ -34,13 +35,21 @@ sessionRoute.post("/create-checkout-session", shouldBeUser, async (c) => {
       ui_mode: "custom",
       return_url:
         "http://localhost:3002/return?session_id={CHECKOUT_SESSION_ID}",
+      metadata: {
+        cartItems: JSON.stringify(cart.map(item => ({
+          id: item.id,
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price
+        })))
+      }
     });
 
-    // console.log(session);
+    console.log("✅ Checkout session created:", session.id);
 
     return c.json({ checkoutSessionClientSecret: session.client_secret });
   } catch (error) {
-    console.log(error);
+    console.error("❌ Error creating checkout session:", error);
     return c.json({ error });
   }
 });
@@ -54,7 +63,36 @@ sessionRoute.get("/:session_id", async (c) => {
     }
   );
 
-  // console.log(session);
+  // If payment is completed, publish event to create order
+  if (session.payment_status === "paid" && session.status === "complete") {
+    const lineItems = session.line_items?.data || [];
+    const cartItems = session.metadata?.cartItems ? JSON.parse(session.metadata.cartItems) : [];
+    
+    try {
+      await producer.send("payment.successful", {
+        value: {
+          userId: session.client_reference_id,
+          email: session.customer_details?.email,
+          amount: session.amount_total,
+          status: "success",
+          products: cartItems.length > 0 
+            ? cartItems.map((item: any) => ({
+                name: item.name,
+                quantity: item.quantity,
+                price: item.price * 100, // Convert to cents
+              }))
+            : lineItems.map((item) => ({
+                name: item.description,
+                quantity: item.quantity,
+                price: item.price?.unit_amount,
+              })),
+        },
+      });
+      console.log("✅ Order event published for session:", session_id);
+    } catch (error) {
+      console.error("❌ Failed to publish order event:", error);
+    }
+  }
 
   return c.json({
     status: session.status,

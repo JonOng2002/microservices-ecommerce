@@ -1,5 +1,6 @@
-import CardList from "@/components/CardList";
-import { Badge } from "@/components/ui/badge";
+"use client";
+
+// Unused imports removed
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -20,21 +21,15 @@ import { Button } from "@/components/ui/button";
 import EditUser from "@/components/EditUser";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AppLineChart from "@/components/AppLineChart";
-import { auth, User } from "@clerk/nextjs/server";
-
-export const dynamic = 'force-dynamic';
+import { User } from "@clerk/nextjs/server";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const getData = async (id: string): Promise<User | null> => {
-  const { getToken } = await auth();
-  const token = await getToken();
   try {
+    // Auth removed - no token needed
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/users/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
+      `${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/users/${id}`
     );
     const data = await res.json();
     return data;
@@ -44,13 +39,29 @@ const getData = async (id: string): Promise<User | null> => {
   }
 };
 
-const SingleUserPage = async ({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) => {
-  const { id } = await params;
-  const data = await getData(id);
+const SingleUserPage = () => {
+  const params = useParams();
+  const id = params.id as string;
+  const [data, setData] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (id) {
+      getData(id)
+        .then((user) => {
+          setData(user);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error fetching user:", error);
+          setLoading(false);
+        });
+    }
+  }, [id]);
+
+  if (loading) {
+    return <div className="">Loading user data...</div>;
+  }
 
   if (!data) {
     return <div className="">User not found!</div>;

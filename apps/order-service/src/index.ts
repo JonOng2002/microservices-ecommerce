@@ -1,5 +1,6 @@
 import Fastify from "fastify";
 import Clerk from "@clerk/fastify";
+import cors from "@fastify/cors";
 import { shouldBeUser } from "./middleware/authMiddleware.js";
 import { connectOrderDB } from "@repo/order-db";
 import { orderRoute } from "./routes/order.js";
@@ -7,6 +8,15 @@ import { consumer, producer } from "./utils/kafka.js";
 import { runKafkaSubscriptions } from "./utils/subscriptions.js";
 
 const fastify = Fastify();
+
+// Register CORS plugin BEFORE other plugins (handles preflight requests)
+fastify.register(cors, {
+  origin: [
+    "http://localhost:3002", // Client frontend
+    "http://localhost:3003", // Admin frontend
+  ],
+  credentials: true, // Allow credentials (cookies, authorization headers)
+});
 
 // Health endpoint BEFORE Clerk plugin (so it doesn't require auth)
 fastify.get("/health", async (request, reply) => {

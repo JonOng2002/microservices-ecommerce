@@ -1,7 +1,7 @@
 import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import { clerkMiddleware } from "@clerk/express";
-import { shouldBeAdmin } from "./middleware/authMiddleware.js";
+// Auth removed - no middleware needed
 import userRoute from "./routes/user.route";
 import { producer } from "./utils/kafka.js";
 
@@ -22,9 +22,11 @@ app.get("/health", (req: Request, res: Response) => {
 });
 
 app.use(express.json());
-app.use(clerkMiddleware());
+// Auth removed - Clerk middleware not needed
+// app.use(clerkMiddleware());
 
-app.use("/users", shouldBeAdmin, userRoute);
+// Auth removed - all routes are public for easier deployment
+app.use("/users", userRoute);
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.log(err);

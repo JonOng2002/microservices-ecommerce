@@ -33,17 +33,8 @@ import { ScrollArea } from "./ui/scroll-area";
 import { CategoryType, colors, ProductFormSchema, sizes } from "@repo/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { useAuth } from "@clerk/nextjs";
-
-// const categories = [
-//   "T-shirts",
-//   "Shoes",
-//   "Accessories",
-//   "Bags",
-//   "Dresses",
-//   "Jackets",
-//   "Gloves",
-// ] as const;
+// Auth removed - no Clerk imports needed
+import React from "react";
 
 const fetchCategories = async () => {
   const res = await fetch(
@@ -72,16 +63,17 @@ const AddProduct = () => {
     },
   });
 
-  const { isPending, error, data } = useQuery({
+  const { data } = useQuery({
     queryKey: ["categories"],
     queryFn: fetchCategories,
   });
 
-  const { getToken } = useAuth();
+  // Auth removed - no token needed
+  const [uploading, setUploading] = React.useState<Record<string, boolean>>({});
 
   const mutation = useMutation({
     mutationFn: async (data: z.infer<typeof ProductFormSchema>) => {
-      const token = await getToken();
+      // Auth removed - no token needed
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_PRODUCT_SERVICE_URL}/products`,
         {
@@ -89,7 +81,6 @@ const AddProduct = () => {
           body: JSON.stringify(data),
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -104,6 +95,37 @@ const AddProduct = () => {
       toast.error(error.message);
     },
   });
+
+  // Helper function to get presigned URL - auth removed
+  const getPresignedUrl = async (
+    file: File,
+    color: string
+  ): Promise<{ uploadUrl: string; imageUrl: string }> => {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_PRODUCT_SERVICE_URL}/upload/presign`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          filename: file.name,
+          contentType: file.type,
+          color: color,
+        }),
+      }
+    );
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(
+        errorData?.message ||
+          `Failed to get upload URL (${res.status || "unknown"})`
+      );
+    }
+
+    return await res.json();
+  };
 
   return (
     <SheetContent>
@@ -194,7 +216,10 @@ const AddProduct = () => {
                       <FormItem>
                         <FormLabel>Category</FormLabel>
                         <FormControl>
-                          <Select onValueChange={field.onChange} value={field.value}>
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value}
+                          >
                             <SelectTrigger>
                               <SelectValue placeholder="Select a category" />
                             </SelectTrigger>
@@ -306,78 +331,110 @@ const AddProduct = () => {
                 <FormField
                   control={form.control}
                   name="images"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Images</FormLabel>
-                      <FormControl>
-                        <div className="">
-                          {form.watch("colors")?.map((color) => (
-                            <div
-                              className="mb-4 flex items-center gap-4"
-                              key={color}
-                            >
-                              <div className="flex items-center gap-2">
-                                <div
-                                  className="w-4 h-4 rounded-full"
-                                  style={{ backgroundColor: color }}
-                                />
-                                <span className="text-sm font-medium min-w-[80px]">
-                                  {color}:
-                                </span>
-                              </div>
-                              <Input
-                                type="file"
-                                accept="image/*"
-                                onChange={async (e) => {
-                                  const file = e.target.files?.[0];
-                                  if (file) {
-                                    try {
-                                      const formData = new FormData();
-                                      formData.append("file", file);
-                                      formData.append(
-                                        "upload_preset",
-                                        "ecommerce"
-                                      );
+                  render={({ field }) => {
+                    return (
+                      <FormItem>
+                        <FormLabel>Images</FormLabel>
+                        <FormControl>
+                          <div className="">
+                            {form.watch("colors")?.map((color) => (
+                              <div
+                                className="mb-4 flex items-center gap-4"
+                                key={color}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <div
+                                    className="w-4 h-4 rounded-full"
+                                    style={{ backgroundColor: color }}
+                                  />
+                                  <span className="text-sm font-medium min-w-[80px]">
+                                    {color}:
+                                  </span>
+                                </div>
+                                <Input
+                                  type="file"
+                                  accept="image/*"
+                                      disabled={uploading[color]}
+                                  onChange={async (e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                      setUploading((prev) => ({
+                                        ...prev,
+                                        [color]: true,
+                                      }));
+                                      try {
+                                        // Auth removed - no token needed
+                                        const { uploadUrl, imageUrl } =
+                                          await getPresignedUrl(file, color);
 
-                                      const res = await fetch(
-                                        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
-                                        {
-                                          method: "POST",
-                                          body: formData,
+                                        // Upload directly to S3 using presigned URL
+                                        const uploadRes = await fetch(uploadUrl, {
+                                          method: "PUT",
+                                          body: file,
+                                          headers: {
+                                            "Content-Type": file.type,
+                                          },
+                                        });
+
+                                        if (!uploadRes.ok) {
+                                          throw new Error(
+                                            "Failed to upload image to S3"
+                                          );
                                         }
-                                      );
-                                      const data = await res.json();
 
-                                      if (data.secure_url) {
+                                        // Set the image URL in form
                                         const currentImages =
                                           form.getValues("images") || {};
-                                        form.setValue("images", {
+                                        const newImages = {
                                           ...currentImages,
-                                          [color]: data.secure_url,
+                                          [color]: imageUrl,
+                                        };
+                                        form.setValue("images", newImages, {
+                                          shouldValidate: true,
                                         });
+                                        toast.success(
+                                          `${color} image uploaded successfully!`
+                                        );
+                                      } catch (error: any) {
+                                        console.error(
+                                          "Image upload error:",
+                                          error
+                                        );
+                                        toast.error(
+                                          `Upload failed: ${
+                                            error.message || "Unknown error"
+                                          }`
+                                        );
+                                      } finally {
+                                        setUploading((prev) => ({
+                                          ...prev,
+                                          [color]: false,
+                                        }));
                                       }
-                                    } catch (error) {
-                                      console.log(error);
-                                      toast.error("Upload failed!");
                                     }
-                                  }
-                                }}
-                              />
-                              {field.value?.[color] ? (
-                                <span className="text-green-600 text-sm">
-                                  Image selected
-                                </span>
-                              ) : (
-                                <span className="text-red-600 text-sm">
-                                  Image required
-                                </span>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </FormControl>
-                    </FormItem>
-                  )}
+                                  }}
+                                />
+                                {uploading[color] ? (
+                                  <span className="text-blue-600 text-sm">
+                                    Uploading...
+                                  </span>
+                                ) : field.value?.[color] ? (
+                                  <span className="text-green-600 text-sm">
+                                    Image selected ✓
+                                  </span>
+                                ) : (
+                                  <span className="text-red-600 text-sm">
+                                    Image required
+                                  </span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
                 />
                 <Button
                   type="submit"

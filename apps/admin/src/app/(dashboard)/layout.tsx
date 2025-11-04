@@ -1,20 +1,27 @@
+"use client";
+
 import AppSidebar from "@/components/AppSidebar";
 import Navbar from "@/components/Navbar";
 import QueryProvider from "@/components/providers/QueryProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { cookies } from "next/headers";
 import { ToastContainer } from "react-toastify";
+import { useEffect, useState } from "react";
 
-export const dynamic = 'force-dynamic';
-
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const cookieStore = await cookies();
-  const defaultOpen = cookieStore.get("sidebar_state")?.value === "true";
+  const [defaultOpen, setDefaultOpen] = useState(false);
+
+  // Use localStorage instead of cookies for static export compatibility
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("sidebar_state");
+      setDefaultOpen(saved === "true");
+    }
+  }, []);
 
   return (
     <QueryProvider>

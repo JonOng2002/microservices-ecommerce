@@ -1,21 +1,24 @@
 import { FastifyInstance } from "fastify";
-import { shouldBeAdmin, shouldBeUser } from "../middleware/authMiddleware";
+// Auth removed - no middleware needed
 import { Order } from "@repo/order-db";
 import { startOfMonth, subMonths } from "date-fns";
 import { OrderChartType } from "@repo/types";
 
 export const orderRoute = async (fastify: FastifyInstance) => {
+  // Auth removed - all routes are public for easier deployment
   fastify.get(
     "/user-orders",
-    { preHandler: shouldBeUser },
     async (request, reply) => {
-      const orders = await Order.find({ userId: request.userId });
+      // userId removed - return all orders or filter by query param if needed
+      const { userId } = request.query as { userId?: string };
+      const orders = userId 
+        ? await Order.find({ userId })
+        : await Order.find();
       return reply.send(orders);
     }
   );
   fastify.get(
     "/orders",
-    { preHandler: shouldBeAdmin },
     async (request, reply) => {
       const { limit } = request.query as { limit: number };
       const orders = await Order.find().limit(limit).sort({ createdAt: -1 });
@@ -24,7 +27,6 @@ export const orderRoute = async (fastify: FastifyInstance) => {
   );
   fastify.get(
     "/order-chart",
-    { preHandler: shouldBeAdmin },
     async (request, reply) => {
       const now = new Date();
       const sixMonthsAgo = startOfMonth(subMonths(now, 5));

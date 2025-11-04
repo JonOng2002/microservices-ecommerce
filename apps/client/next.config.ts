@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // output: "export", // Disabled for local dev - conflicts with dynamic routes using auth()
+  // Enable static export for production builds
+  output: process.env.NODE_ENV === "production" ? "export" : undefined,
   images: {
     unoptimized: true, // Required for static export
     remotePatterns: [
@@ -13,8 +14,18 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "res.cloudinary.com",
       },
+      {
+        protocol: "https",
+        hostname: "is458-products-img.s3.ap-southeast-1.amazonaws.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.s3.*.amazonaws.com",
+      },
     ],
   },
+  // Trailing slash required for S3 static hosting
+  trailingSlash: true,
 };
 
 export default nextConfig;

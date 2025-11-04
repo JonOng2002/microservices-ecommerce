@@ -4,14 +4,13 @@ import {
   deleteProduct,
   updateProduct,
 } from "../controllers/product.controller";
-import { shouldBeAdmin } from "../middleware/authMiddleware";
 
 const router: Router = Router();
 
-// Only protected routes (GET routes are public and handled in index.ts)
+// Removed auth - making public for easier deployment
 router.post("/", createProduct);
-router.put("/:id", shouldBeAdmin, updateProduct);
-router.delete("/:id", shouldBeAdmin, deleteProduct);
+router.put("/:id", updateProduct);
+router.delete("/:id", deleteProduct);
 // GET routes moved to index.ts as public routes
 
 export default router;

@@ -21,7 +21,7 @@ import {
 import { DataTablePagination } from "@/components/TablePagination";
 import { useState } from "react";
 import { Trash2 } from "lucide-react";
-import { useAuth } from "@clerk/nextjs";
+// Auth removed - no Clerk needed
 import { useMutation } from "@tanstack/react-query";
 import { User } from "@clerk/nextjs/server";
 import { toast } from "react-toastify";
@@ -53,24 +53,21 @@ export function DataTable<TData, TValue>({
     },
   });
 
-  const { getToken } = useAuth();
+  // Auth removed - no token needed
   const router = useRouter()
 
   const mutation = useMutation({
     mutationFn: async () => {
-      const token = await getToken();
       const selectedRows = table.getSelectedRowModel().rows;
 
       Promise.all(
         selectedRows.map(async (row) => {
           const userId = (row.original as User).id;
+          // Auth removed - no token needed
           const res = await fetch(
             `${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/users/${userId}`,
             {
               method: "DELETE",
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
             }
           );
         })

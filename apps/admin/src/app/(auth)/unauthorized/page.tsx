@@ -1,13 +1,11 @@
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
-
+// Auth removed - this page is no longer needed but kept for compatibility
 const Page = () => {
-  const { signOut } = useAuth();
   return (
     <div className="">
-      <h1>You do not have an access!</h1>
-      <button onClick={() => signOut()}>Sign out</button>
+      <h1>Access Granted</h1>
+      <p>Auth has been removed - all routes are public.</p>
     </div>
   );
 };

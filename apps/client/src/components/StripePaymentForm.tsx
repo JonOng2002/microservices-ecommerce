@@ -13,21 +13,40 @@ const stripe = loadStripe(
 );
 
 const fetchClientSecret = async (cart: CartItemsType, token: string) => {
-  return fetch(
-    `${process.env.NEXT_PUBLIC_PAYMENT_SERVICE_URL}/sessions/create-checkout-session`,
-    {
-      method: "POST",
-      body: JSON.stringify({
-        cart,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_PAYMENT_SERVICE_URL}/sessions/create-checkout-session`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          cart,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("❌ Checkout session error:", response.status, errorText);
+      throw new Error(`Failed to create checkout session: ${response.status}`);
     }
-  )
-    .then((response) => response.json())
-    .then((json) => json.checkoutSessionClientSecret);
+
+    const json = await response.json();
+    console.log("✅ Checkout session response:", json);
+    
+    if (!json.checkoutSessionClientSecret) {
+      console.error("❌ No client secret in response:", json);
+      throw new Error("No client secret returned from server");
+    }
+    
+    return json.checkoutSessionClientSecret;
+  } catch (error) {
+    console.error("❌ fetchClientSecret error:", error);
+    throw error;
+  }
 };
 
 const StripePaymentForm = ({

@@ -1,12 +1,18 @@
-import { auth } from "@clerk/nextjs/server";
+"use client";
 
-export const dynamic = 'force-dynamic';
+import { useAuth } from "@clerk/nextjs";
+import { useEffect } from "react";
 
-const TestPage = async () => {
-  const { getToken } = await auth();
-  const token = await getToken();
+const TestPage = () => {
+  const { getToken, isLoaded } = useAuth();
 
-  console.log(token)
+  useEffect(() => {
+    if (isLoaded) {
+      getToken().then((token) => {
+        console.log(token);
+      });
+    }
+  }, [isLoaded, getToken]);
 
   // const resProduct = await fetch("http://localhost:8000/test", {
   //   headers: {

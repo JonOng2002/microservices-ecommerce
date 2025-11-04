@@ -22,7 +22,6 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { CategoryFormSchema } from "@repo/types";
 import { useMutation } from "@tanstack/react-query";
-import { useAuth } from "@clerk/nextjs";
 import { toast } from "react-toastify";
 
 const AddCategory = () => {
@@ -34,11 +33,9 @@ const AddCategory = () => {
     },
   });
 
-  const { getToken } = useAuth();
-
+  // Auth removed - no token needed
   const mutation = useMutation({
     mutationFn: async (data: z.infer<typeof CategoryFormSchema>) => {
-      const token = await getToken();
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_PRODUCT_SERVICE_URL}/categories`,
         {
@@ -46,7 +43,6 @@ const AddCategory = () => {
           body: JSON.stringify(data),
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
         }
       );
