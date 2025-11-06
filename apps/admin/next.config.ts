@@ -1,10 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Enable static export for production builds
-  output: process.env.NODE_ENV === "production" ? "export" : undefined,
+  // Removed static export - using SSR for Amplify
   images: {
-    unoptimized: true, // Required for static export
     remotePatterns: [
       {
         protocol: "https",
@@ -26,10 +24,12 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "*.s3.*.amazonaws.com",
       },
+      {
+        protocol: "https",
+        hostname: "is458g1t2.jonongca.com",
+      },
     ],
   },
-  // Trailing slash required for S3 static hosting
-  trailingSlash: true,
 };
 
 export default nextConfig;

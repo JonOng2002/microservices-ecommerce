@@ -14,7 +14,10 @@ const app = express();
 
 app.use(
   cors({
-    origin: ["http://localhost:3002", "http://localhost:3003"],
+    origin: [
+      process.env.CLIENT_URL || "http://localhost:3002",
+      process.env.ADMIN_URL || "http://localhost:3003"
+    ],
     credentials: true,
   })
 );

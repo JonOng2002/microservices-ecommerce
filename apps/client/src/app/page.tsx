@@ -1,26 +1,13 @@
-"use client";
-
 import ProductList from "@/components/ProductList";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import HomepageContent from "./HomepageContent";
 
-const HomepageContent = () => {
-  const searchParams = useSearchParams();
-  const category = searchParams.get("category") || undefined;
-
-  return (
-    <div className="">
-      <div className="relative aspect-[3/1] mb-12">
-        <Image src="/featured.png" alt="Featured Product" fill />
-      </div>
-      <ProductList category={category} params="homepage"/>
-    </div>
-  );
-};
+// Force dynamic rendering since HomepageContent uses useSearchParams
+export const dynamic = 'force-dynamic';
 
 const Homepage = () => {
-  // Suspense is still needed for useSearchParams() in HomepageContent
+  // Suspense is needed for useSearchParams() in HomepageContent
   return (
     <Suspense fallback={
       <div className="">

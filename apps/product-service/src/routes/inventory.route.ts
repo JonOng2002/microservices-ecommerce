@@ -6,15 +6,14 @@ import {
   deleteInventory,
   getLowStock,
 } from "../controllers/inventory.controller";
-import { shouldBeAdmin } from "../middleware/authMiddleware";
 
 const router: Router = Router();
 
-router.post("/", shouldBeAdmin, createInventory);
-router.get("/low-stock", shouldBeAdmin, getLowStock);
+router.post("/", createInventory);
+router.get("/low-stock", getLowStock);
 router.get("/", getInventory);
-router.put("/:productId", shouldBeAdmin, updateInventory);
-router.delete("/:productId", shouldBeAdmin, deleteInventory);
+router.put("/:productId", updateInventory);
+router.delete("/:productId", deleteInventory);
 
 export default router;
 

@@ -1,5 +1,8 @@
 import Link from "next/link";
 
+// Force dynamic rendering since this page uses searchParams
+export const dynamic = 'force-dynamic';
+
 const ReturnPage = async ({
   searchParams,
 }: {

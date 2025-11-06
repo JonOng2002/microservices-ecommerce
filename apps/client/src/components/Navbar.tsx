@@ -11,6 +11,7 @@ import {
   UserButton,
 } from "@clerk/nextjs";
 import ProfileButton from "./ProfileButton";
+import { Suspense } from "react";
 
 const Navbar = () => {
   return (
@@ -30,7 +31,9 @@ const Navbar = () => {
       </Link>
       {/* RIGHT */}
       <div className="flex items-center gap-6">
-        <SearchBar />
+        <Suspense fallback={<div className="w-32 h-8" />}>
+          <SearchBar />
+        </Suspense>
         <Link href="/">
           <Home className="w-4 h-4 text-gray-600" />
         </Link>

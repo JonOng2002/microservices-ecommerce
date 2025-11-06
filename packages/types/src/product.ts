@@ -71,7 +71,7 @@ export const ProductFormSchema = z
     stock_threshold: z
       .number({ message: "Stock threshold is required!" })
       .min(0, { message: "Stock threshold must be 0 or greater!" })
-      .default(5),
+      .optional(),
   })
   .refine(
     (data) => {

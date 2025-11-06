@@ -43,12 +43,12 @@ yarn-error.log*
 # env files
 .env*
 
-#scripts
-scripts/setup-local-env.sh
-scripts/check-services.sh
-scripts/setup-local-dynamodb.sh
-scripts/generate-prisma-client.sh
-scripts/fix-kafka-topics.sh
+# All scripts (sensitive - may contain credentials, IPs, passwords)
+scripts/**/*.sh
+scripts/**/*.bash
+scripts/*.sh
+docker/**/*.sh
+*.sh
 
 #ecs
 ecs/task-definitions/*
@@ -91,3 +91,13 @@ START_FRONTEND_WITH_DOCKER.md
 docker-compose.fullstack-test.yml
 
 docs/
+
+*.config.txt
+.env.docker-test
+S3_PUBLIC_READ_POLICY.json
+team-env-files.zip
+env-files.zip
+*-env-*.zip
+kafka-config.txt
+ecs-fargate-deployment-plan.plan.md
+ecs/

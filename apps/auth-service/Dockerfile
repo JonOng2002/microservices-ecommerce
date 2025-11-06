@@ -1,6 +1,9 @@
 # Single-stage build for auth-service (optimized for ECS deployment)
 FROM node:18-alpine
 
+# Install curl for health checks
+RUN apk add --no-cache curl
+
 # Install pnpm
 RUN npm install -g pnpm@9.0.0
 

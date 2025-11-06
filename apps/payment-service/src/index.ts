@@ -11,7 +11,10 @@ const app = new Hono();
 
 // CORS FIRST - Must handle OPTIONS preflight requests before any other middleware
 app.use("*", cors({ 
-  origin: ["http://localhost:3002", "http://localhost:3003"],
+  origin: [
+    process.env.CLIENT_URL || "http://localhost:3002",
+    process.env.ADMIN_URL || "http://localhost:3003"
+  ],
   credentials: true,
   allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowHeaders: ["Content-Type", "Authorization"]

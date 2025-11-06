@@ -10,8 +10,8 @@ const fastify = Fastify();
 // Register CORS plugin BEFORE other plugins (handles preflight requests)
 fastify.register(cors, {
   origin: [
-    "http://localhost:3002", // Client frontend
-    "http://localhost:3003", // Admin frontend
+    process.env.CLIENT_URL || "http://localhost:3002", // Client frontend
+    process.env.ADMIN_URL || "http://localhost:3003", // Admin frontend
   ],
   credentials: true, // Allow credentials (cookies, authorization headers)
 });

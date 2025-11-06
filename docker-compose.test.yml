@@ -65,6 +65,8 @@ services:
   product-service:
     image: product-service:test
     container_name: test-product-service
+    env_file:
+      - .env.docker-test
     ports:
       - "8000:8000"
     environment:
@@ -90,6 +92,8 @@ services:
   order-service:
     image: order-service:test
     container_name: test-order-service
+    env_file:
+      - .env.docker-test
     ports:
       - "8001:8001"
     environment:
@@ -114,6 +118,8 @@ services:
   payment-service:
     image: payment-service:test
     container_name: test-payment-service
+    env_file:
+      - .env.docker-test
     ports:
       - "8002:8002"
     environment:
@@ -131,6 +137,8 @@ services:
   auth-service:
     image: auth-service:test
     container_name: test-auth-service
+    env_file:
+      - .env.docker-test
     ports:
       - "8003:8003"
     environment:
@@ -146,6 +154,8 @@ services:
   email-service:
     image: email-service:test
     container_name: test-email-service
+    env_file:
+      - .env.docker-test
     environment:
       KAFKA_BROKERS: kafka:9092
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
