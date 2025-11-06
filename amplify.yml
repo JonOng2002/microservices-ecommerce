@@ -6,11 +6,14 @@ applications:
         preBuild:
           commands:
             - npm install -g pnpm
-            - pnpm install
-            - cd ../../packages/product-db && pnpm db:generate && cd ../..
+            # Go to workspace root and install all dependencies
+            - cd ../.. && pnpm install
+            # Generate Prisma client
+            - cd packages/product-db && pnpm db:generate
         build:
           commands:
-            - pnpm next build
+            # Use pnpm exec to run next from the local node_modules
+            - cd ../../apps/client && pnpm exec next build
       artifacts:
         baseDirectory: .next/standalone
         files:
@@ -20,23 +23,22 @@ applications:
           - ../../.pnpm-store/**/*
           - .next/cache/**/*
           - ../../packages/product-db/generated/**/*
-          # Only cache essential node_modules (not all 15 projects)
           - ../../node_modules/.pnpm/**/*
-          - ../../node_modules/@repo/**/*
-          - ../../node_modules/next/**/*
-          - ../../node_modules/react/**/*
-          - ../../node_modules/react-dom/**/*
+          
   - appRoot: apps/admin
     frontend:
       phases:
         preBuild:
           commands:
             - npm install -g pnpm
-            - pnpm install
-            - cd ../../packages/product-db && pnpm db:generate && cd ../..
+            # Go to workspace root and install all dependencies
+            - cd ../.. && pnpm install
+            # Generate Prisma client
+            - cd packages/product-db && pnpm db:generate
         build:
           commands:
-            - pnpm next build
+            # Use pnpm exec to run next from the local node_modules
+            - cd ../../apps/admin && pnpm exec next build
       artifacts:
         baseDirectory: .next/standalone
         files:
@@ -46,9 +48,4 @@ applications:
           - ../../.pnpm-store/**/*
           - .next/cache/**/*
           - ../../packages/product-db/generated/**/*
-          # Only cache essential node_modules (not all 15 projects)
           - ../../node_modules/.pnpm/**/*
-          - ../../node_modules/@repo/**/*
-          - ../../node_modules/next/**/*
-          - ../../node_modules/react/**/*
-          - ../../node_modules/react-dom/**/*

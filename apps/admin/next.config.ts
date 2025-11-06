@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Removed static export - using SSR for Amplify
+  // Use standalone output for Amplify (bundles node_modules)
+  output: 'standalone',
   images: {
     remotePatterns: [
       {
