@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Use standalone output for Amplify (bundles node_modules)
-  output: 'standalone',
+  // Removed output: 'standalone' for AWS Amplify compatibility
+  // Amplify handles the build output internally for SSR
   images: {
     remotePatterns: [
       {
