@@ -20,3 +20,23 @@ applications:
           - node_modules/**/*
           - .pnpm-store/**/*
           - apps/client/.next/cache/**/*
+  - appRoot: apps/admin
+    frontend:
+      phases:
+        preBuild:
+          commands:
+            - npm install -g pnpm
+            - pnpm install
+        build:
+          commands:
+            - cd apps/admin
+            - pnpm build
+      artifacts:
+        baseDirectory: apps/admin/.next
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - node_modules/**/*
+          - .pnpm-store/**/*
+          - apps/admin/.next/cache/**/*
