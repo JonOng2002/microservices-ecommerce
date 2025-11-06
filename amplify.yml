@@ -7,6 +7,7 @@ applications:
           commands:
             - npm install -g pnpm
             - pnpm install
+            - cd packages/product-db && pnpm db:generate && cd ../..
         build:
           commands:
             - pnpm build
@@ -19,6 +20,7 @@ applications:
           - node_modules/**/*
           - .pnpm-store/**/*
           - apps/client/.next/cache/**/*
+          - packages/product-db/generated/**/*
   - appRoot: apps/admin
     frontend:
       phases:
@@ -26,6 +28,7 @@ applications:
           commands:
             - npm install -g pnpm
             - pnpm install
+            - cd packages/product-db && pnpm db:generate && cd ../..
         build:
           commands:
             - pnpm build
@@ -38,3 +41,4 @@ applications:
           - node_modules/**/*
           - .pnpm-store/**/*
           - apps/admin/.next/cache/**/*
+          - packages/product-db/generated/**/*
