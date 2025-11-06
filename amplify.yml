@@ -12,15 +12,15 @@ applications:
           commands:
             - pnpm build
       artifacts:
-        baseDirectory: apps/client/.next
+        baseDirectory: .next
         files:
           - '**/*'
       cache:
         paths:
           - node_modules/**/*
           - .pnpm-store/**/*
-          - apps/client/.next/cache/**/*
-          - packages/product-db/generated/**/*
+          - .next/cache/**/*
+          - ../../packages/product-db/generated/**/*
   - appRoot: apps/admin
     frontend:
       phases:
@@ -33,12 +33,12 @@ applications:
           commands:
             - pnpm build
       artifacts:
-        baseDirectory: apps/admin/.next
+        baseDirectory: .next
         files:
           - '**/*'
       cache:
         paths:
           - node_modules/**/*
           - .pnpm-store/**/*
-          - apps/admin/.next/cache/**/*
-          - packages/product-db/generated/**/*
+          - .next/cache/**/*
+          - ../../packages/product-db/generated/**/*
