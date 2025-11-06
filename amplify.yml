@@ -10,7 +10,7 @@ applications:
             - cd ../../packages/product-db && pnpm db:generate && cd ../..
         build:
           commands:
-            - next build
+            - pnpm next build
       artifacts:
         baseDirectory: .next/standalone
         files:
@@ -36,7 +36,7 @@ applications:
             - cd ../../packages/product-db && pnpm db:generate && cd ../..
         build:
           commands:
-            - next build
+            - pnpm next build
       artifacts:
         baseDirectory: .next/standalone
         files:
