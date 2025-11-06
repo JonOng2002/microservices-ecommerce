@@ -10,17 +10,22 @@ applications:
             - cd ../../packages/product-db && pnpm db:generate && cd ../..
         build:
           commands:
-            - pnpm build
+            - next build
       artifacts:
-        baseDirectory: .next
+        baseDirectory: .next/standalone
         files:
           - '**/*'
       cache:
         paths:
-          - node_modules/**/*
-          - .pnpm-store/**/*
+          - ../../.pnpm-store/**/*
           - .next/cache/**/*
           - ../../packages/product-db/generated/**/*
+          # Only cache essential node_modules (not all 15 projects)
+          - ../../node_modules/.pnpm/**/*
+          - ../../node_modules/@repo/**/*
+          - ../../node_modules/next/**/*
+          - ../../node_modules/react/**/*
+          - ../../node_modules/react-dom/**/*
   - appRoot: apps/admin
     frontend:
       phases:
@@ -31,14 +36,19 @@ applications:
             - cd ../../packages/product-db && pnpm db:generate && cd ../..
         build:
           commands:
-            - pnpm build
+            - next build
       artifacts:
-        baseDirectory: .next
+        baseDirectory: .next/standalone
         files:
           - '**/*'
       cache:
         paths:
-          - node_modules/**/*
-          - .pnpm-store/**/*
+          - ../../.pnpm-store/**/*
           - .next/cache/**/*
           - ../../packages/product-db/generated/**/*
+          # Only cache essential node_modules (not all 15 projects)
+          - ../../node_modules/.pnpm/**/*
+          - ../../node_modules/@repo/**/*
+          - ../../node_modules/next/**/*
+          - ../../node_modules/react/**/*
+          - ../../node_modules/react-dom/**/*
