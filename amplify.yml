@@ -9,7 +9,6 @@ applications:
             - pnpm install
         build:
           commands:
-            - cd apps/client
             - pnpm build
       artifacts:
         baseDirectory: apps/client/.next
@@ -29,7 +28,6 @@ applications:
             - pnpm install
         build:
           commands:
-            - cd apps/admin
             - pnpm build
       artifacts:
         baseDirectory: apps/admin/.next
