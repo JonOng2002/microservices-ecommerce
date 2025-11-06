@@ -7,7 +7,7 @@ applications:
           commands:
             - npm install -g pnpm
             - pnpm install
-            - cd packages/product-db && pnpm db:generate && cd ../..
+            - cd ../../packages/product-db && pnpm db:generate && cd ../..
         build:
           commands:
             - pnpm build
@@ -28,7 +28,7 @@ applications:
           commands:
             - npm install -g pnpm
             - pnpm install
-            - cd packages/product-db && pnpm db:generate && cd ../..
+            - cd ../../packages/product-db && pnpm db:generate && cd ../..
         build:
           commands:
             - pnpm build
