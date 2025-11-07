@@ -12,6 +12,10 @@ fastify.register(cors, {
   origin: [
     process.env.CLIENT_URL || "http://localhost:3002", // Client frontend
     process.env.ADMIN_URL || "http://localhost:3003", // Admin frontend
+    "https://main.d18wbnrtlaqqva.amplifyapp.com", // Amplify client domain
+    "https://main.d21ddnl9n8aqva.amplifyapp.com", // Amplify admin domain
+    "https://shop.is458g1t2.jonongca.com", // Custom client domain
+    "https://admin.is458g1t2.jonongca.com", // Custom admin domain
   ],
   credentials: true, // Allow credentials (cookies, authorization headers)
 });
