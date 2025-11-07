@@ -3,14 +3,15 @@ import Link from "next/link";
 import SearchBar from "./SearchBar";
 import { Bell, Home, ShoppingCart } from "lucide-react";
 import ShoppingCartIcon from "./ShoppingCartIcon";
-import {
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  SignUpButton,
-  UserButton,
-} from "@clerk/nextjs";
-import ProfileButton from "./ProfileButton";
+// Clerk components temporarily disabled for deployment testing
+// import {
+//   SignedIn,
+//   SignedOut,
+//   SignInButton,
+//   SignUpButton,
+//   UserButton,
+// } from "@clerk/nextjs";
+// import ProfileButton from "./ProfileButton";
 import { Suspense } from "react";
 
 const Navbar = () => {
@@ -39,12 +40,13 @@ const Navbar = () => {
         </Link>
         <Bell className="w-4 h-4 text-gray-600" />
         <ShoppingCartIcon />
-        <SignedOut>
+        {/* Authentication temporarily disabled for deployment testing */}
+        {/* <SignedOut>
           <SignInButton />
         </SignedOut>
         <SignedIn>
           <ProfileButton />
-        </SignedIn>
+        </SignedIn> */}
       </div>
     </nav>
   );

@@ -1,18 +1,20 @@
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
+// import { useAuth } from "@clerk/nextjs"; // Temporarily disabled for deployment testing
 import { useEffect } from "react";
 
 const TestPage = () => {
-  const { getToken, isLoaded } = useAuth();
+  // Authentication temporarily disabled for deployment testing
+  // const { getToken, isLoaded } = useAuth();
 
   useEffect(() => {
-    if (isLoaded) {
-      getToken().then((token) => {
-        console.log(token);
-      });
-    }
-  }, [isLoaded, getToken]);
+    console.log("Authentication temporarily disabled for deployment testing");
+    // if (isLoaded) {
+    //   getToken().then((token) => {
+    //     console.log(token);
+    //   });
+    // }
+  }, []);
 
   // const resProduct = await fetch("http://localhost:8000/test", {
   //   headers: {

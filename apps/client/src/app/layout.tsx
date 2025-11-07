@@ -4,7 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { ToastContainer } from "react-toastify";
-import { ClerkProvider } from "@clerk/nextjs";
+// import { ClerkProvider } from "@clerk/nextjs"; // Temporarily disabled for deployment testing
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,14 +26,14 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
-
-  if (!publishableKey) {
-    throw new Error("Missing NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY environment variable");
-  }
+  // Authentication temporarily disabled for deployment testing
+  // const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  // if (!publishableKey) {
+  //   throw new Error("Missing NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY environment variable");
+  // }
 
   return (
-    <ClerkProvider publishableKey={publishableKey}>
+    // <ClerkProvider publishableKey={publishableKey}>
       <html lang="en">
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
@@ -46,6 +46,6 @@ export default function RootLayout({
           <ToastContainer position="bottom-right" />
         </body>
       </html>
-    </ClerkProvider>
+    // </ClerkProvider>
   );
 }

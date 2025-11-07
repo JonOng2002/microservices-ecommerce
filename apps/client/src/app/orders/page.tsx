@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
+// import { useAuth } from "@clerk/nextjs"; // Temporarily disabled for deployment testing
 import { OrderType } from "@repo/types";
 import { useEffect, useState } from "react";
 
@@ -12,7 +12,7 @@ const fetchOrders = async (token: string | null, userId: string | null): Promise
       `${process.env.NEXT_PUBLIC_ORDER_SERVICE_URL}/user-orders?userId=${userId}`,
       {
         headers: {
-          Authorization: `Bearer ${token}`,
+          // Authorization: `Bearer ${token}`, // Temporarily disabled for deployment testing
         },
       }
     );
@@ -31,27 +31,30 @@ const fetchOrders = async (token: string | null, userId: string | null): Promise
 };
 
 const OrdersPage = () => {
-  const { getToken, userId, isLoaded } = useAuth();
+  // Authentication temporarily disabled for deployment testing
+  // const { getToken, userId, isLoaded } = useAuth();
   const [orders, setOrders] = useState<OrderType[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (isLoaded && userId) {
-      getToken()
-        .then((token) => fetchOrders(token, userId))
-        .then((data) => {
-          setOrders(data);
-          setLoading(false);
-        })
-        .catch((error) => {
-          console.error("Error fetching orders:", error);
-          setLoading(false);
-        });
-    } else if (isLoaded && !userId) {
-      // User not authenticated
-      setLoading(false);
-    }
-  }, [isLoaded, getToken, userId]);
+    // Authentication temporarily disabled - show empty state
+    setLoading(false);
+    // if (isLoaded && userId) {
+    //   getToken()
+    //     .then((token) => fetchOrders(token, userId))
+    //     .then((data) => {
+    //       setOrders(data);
+    //       setLoading(false);
+    //     })
+    //     .catch((error) => {
+    //       console.error("Error fetching orders:", error);
+    //       setLoading(false);
+    //     });
+    // } else if (isLoaded && !userId) {
+    //   // User not authenticated
+    //   setLoading(false);
+    // }
+  }, []);
 
   if (loading) {
     return (
