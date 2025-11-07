@@ -18,7 +18,7 @@ app.use(
       process.env.CLIENT_URL || "http://localhost:3002",
       process.env.ADMIN_URL || "http://localhost:3003",
       "https://main.d18wbnrtlaqqva.amplifyapp.com", // Amplify client domain
-      "https://main.d21ddnl9n8aqva.amplifyapp.com", // Amplify admin domain
+      "https://main.d2lddn3ocqgr4o.amplifyapp.com", // Amplify admin domain (correct)
       "https://shop.is458g1t2.jonongca.com", // Custom client domain
       "https://admin.is458g1t2.jonongca.com", // Custom admin domain
     ],
