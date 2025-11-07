@@ -1,7 +1,7 @@
 import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
-import { clerkMiddleware } from "@clerk/express";
-import { shouldBeUser } from "./middleware/authMiddleware.js";
+// import { clerkMiddleware } from "@clerk/express"; // Temporarily disabled for deployment testing
+// import { shouldBeUser } from "./middleware/authMiddleware.js"; // Temporarily disabled for deployment testing
 import productRouter from "./routes/product.route";
 import categoryRouter from "./routes/category.route";
 import inventoryRouter from "./routes/inventory.route";
@@ -38,37 +38,13 @@ app.get("/products", getProducts);
 app.get("/products/:id", getProduct);
 app.get("/categories", getCategories);
 
-const clerkPublishableKey = process.env.CLERK_PUBLISHABLE_KEY;
-const clerkSecretKey = process.env.CLERK_SECRET_KEY;
-
-console.log("🔍 DEBUG - Keys loaded:");
-console.log("Publishable Key:", clerkPublishableKey?.substring(0, 15) + "..." + clerkPublishableKey?.slice(-10));
-console.log("Secret Key:", clerkSecretKey?.substring(0, 15) + "..." + clerkSecretKey?.slice(-10));
-
-
-if (!clerkPublishableKey || !clerkSecretKey) {
-  console.error("⚠️  WARNING: Clerk keys missing!");
-  console.error("CLERK_PUBLISHABLE_KEY:", clerkPublishableKey ? "Set" : "Missing");
-  console.error("CLERK_SECRET_KEY:", clerkSecretKey ? "Set" : "Missing");
-}
-
-// Clerk middleware ONLY for routes registered after this point
-if (clerkPublishableKey && clerkSecretKey) {
-  app.use(clerkMiddleware({
-    publishableKey: clerkPublishableKey,
-    secretKey: clerkSecretKey,
-    // Ensure Clerk reads from Authorization header
-    // By default, it should check both cookies and Authorization header
-  }));
-} else {
-  console.warn("⚠️  Clerk middleware NOT registered - keys missing!");
-}
-
-app.get("/test", shouldBeUser, (req, res) => {
-  res.json({ message: "Product service authenticated", userId: req.userId });
+// Test endpoint (no auth required for deployment testing)
+app.get("/test", (req, res) => {
+  res.json({ message: "Product service working", status: "ok" });
 });
 
-// Protected routes (POST, PUT, DELETE) - require authentication
+// All routes are now public for deployment testing
+// Protected routes (POST, PUT, DELETE) - auth temporarily removed
 app.use("/upload", uploadRouter);
 app.use("/products", productRouter);
 app.use("/categories", categoryRouter);
@@ -87,10 +63,7 @@ const start = async () => {
     console.log("Product service: Kafka connected");
     app.listen(8000, () => {
       console.log("Product service is running on 8000");
-      console.log("Clerk keys status:", {
-        publishableKey: clerkPublishableKey ? "✓ Set" : "✗ Missing",
-        secretKey: clerkSecretKey ? "✓ Set" : "✗ Missing",
-      });
+      console.log("🚀 Authentication temporarily disabled for deployment testing");
     });
   } catch (error) {
     console.error("Product service startup error:", error);

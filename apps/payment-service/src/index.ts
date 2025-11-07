@@ -1,6 +1,6 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
-import { clerkMiddleware } from "@hono/clerk-auth";
+// import { clerkMiddleware } from "@hono/clerk-auth"; // Temporarily disabled for deployment testing
 import sessionRoute from "./routes/session.route.js";
 import { cors } from "hono/cors";
 import { consumer, producer } from "./utils/kafka.js";
@@ -29,8 +29,8 @@ app.get("/health", (c) => {
   });
 });
 
-// Clerk middleware - applied globally but individual routes use shouldBeUser to enforce
-app.use("*", clerkMiddleware());
+// Clerk middleware temporarily disabled for deployment testing
+// app.use("*", clerkMiddleware());
 
 app.route("/sessions", sessionRoute);
 app.route("/webhooks", webhookRoute);
@@ -69,6 +69,7 @@ const start = async () => {
       },
       (info) => {
         console.log(`Payment service is running on port 8002`);
+        console.log("🚀 Authentication temporarily disabled for deployment testing");
       }
     );
     

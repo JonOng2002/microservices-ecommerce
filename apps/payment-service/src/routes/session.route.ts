@@ -1,15 +1,17 @@
 import { Hono } from "hono";
 import stripe from "../utils/stripe";
-import { shouldBeUser } from "../middleware/authMiddleware";
+// import { shouldBeUser } from "../middleware/authMiddleware"; // Temporarily disabled for deployment testing
 import { CartItemsType } from "@repo/types";
 import { getStripeProductPrice } from "../utils/stripeProduct";
 import { producer } from "../utils/kafka";
 
 const sessionRoute = new Hono();
 
-sessionRoute.post("/create-checkout-session", shouldBeUser, async (c) => {
+// Temporarily removed shouldBeUser for deployment testing
+sessionRoute.post("/create-checkout-session", async (c) => {
   const { cart }: { cart: CartItemsType } = await c.req.json();
-  const userId = c.get("userId");
+  // const userId = c.get("userId"); // Temporarily use dummy user ID
+  const userId = "test-user-123"; // Dummy user ID for testing
 
   const lineItems = await Promise.all(
     cart.map(async (item) => {
